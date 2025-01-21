@@ -376,17 +376,17 @@ function ChromeBookSim(canvas, page_width, page_height, tessellation_res) {
 
     this.handleMouseDown = function(event) {
         if(!sim.physics_active) {
-            if(event['ctrlKey']) {
+            // if(event['ctrlKey']) {
                 sim.physics_active = true;
                 if(sim.pages.flipping_page_on_left ^ mouse_x < 0.0) {
                     sim.book_mesh.resetVertArray(mouse_x < 0.0);
                 }
                 sim.pages.liftPage(mouse_x < 0.0);
-            }
-            else {
-                var plane_coords = sim.pick(mouse_x, mouse_y);
-                sim.pages.sendMouseEvent(plane_coords[0], plane_coords[1], event);
-            }
+            // }
+            // else {
+            //     var plane_coords = sim.pick(mouse_x, mouse_y);
+            //     sim.pages.sendMouseEvent(plane_coords[0], plane_coords[1], event);
+            // }
         }
     }
 
@@ -437,7 +437,5 @@ function ChromeBookSim(canvas, page_width, page_height, tessellation_res) {
             return false;
         }
     };
-    canvas.oncontextmenu = function(e) { if(e.ctrlKey) return false; };
-
     this.pick = this.initPicking(45, gl.viewportWidth/gl.viewportHeight);
 }

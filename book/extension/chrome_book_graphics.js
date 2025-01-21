@@ -93,9 +93,10 @@ function handleLoadedTexture(texture, repeat) {
 
 function loadTexture(src, repeat, cb) {
     var tex = gl.createTexture();
-    tex.image = new Image();
-    tex.image.onload = function() { handleLoadedTexture(tex, repeat); if(cb) cb(tex); };
-    tex.image.src = src;
+    var image = document.createElement('img')
+    image.onload = function() { handleLoadedTexture(tex, repeat); if(cb) cb(tex); };
+    image.src = src;
+    tex.image = image;
     return tex;
 }
 
