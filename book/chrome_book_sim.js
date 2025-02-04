@@ -140,6 +140,18 @@ function ChromeBookSim(canvas, page_width, page_height, tessellation_res) {
                     loadTexture("img/page3.jpg", true),
                     loadTexture("img/page4.jpg", true),
                     loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
+                    loadTexture("img/page5.jpg", true),
                     loadTexture("img/page6.jpg", true)];
         this.pages = new PageTextureManager(p);
     }
