@@ -6,6 +6,9 @@
     <title>Open Room with Objects</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+
 </head>
 <body>
     <div id="instructions">Click to Start</div>
@@ -59,71 +62,27 @@
         // Start Camera Inside the Room
         camera.position.set(0, 0, 8);
 
-        // Table
-        const tableGeometry = new THREE.BoxGeometry(3, 0.2, 2);
-        const tableMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-        const table = new THREE.Mesh(tableGeometry, tableMaterial);
-        table.position.set(0, -4, 0);
-        scene.add(table);
+       // Load Materials First (if your model has a .mtl file)
+        const mtlLoader = new THREE.MTLLoader();
+        mtlLoader.load('models/furniture.mtl', function (materials) {
+            materials.preload();
 
-        // Table Legs
-        function createTableLeg(x, z) {
-            const legGeometry = new THREE.BoxGeometry(0.2, 3, 0.2);
-            const leg = new THREE.Mesh(legGeometry, tableMaterial);
-            leg.position.set(x, -5.5, z);
-            scene.add(leg);
-        }
-        createTableLeg(-1.2, -0.8);
-        createTableLeg(1.2, -0.8);
-        createTableLeg(-1.2, 0.8);
-        createTableLeg(1.2, 0.8);
+            // Load OBJ Model
+            const objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials); // Apply materials
+            objLoader.load('models/furniture.obj', function (object) {
+                object.position.set(0, -4, 0);  // Adjust position inside the room
+                object.scale.set(1, 1, 1);  // Scale if necessary
+                scene.add(object);
+            });
+        });
 
-        // Chair
-        const chairSeatGeometry = new THREE.BoxGeometry(1.5, 0.2, 1.5);
-        const chairSeat = new THREE.Mesh(chairSeatGeometry, tableMaterial);
-        chairSeat.position.set(-4, -4.5, 0);
-        scene.add(chairSeat);
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(5, 5, 5);
+        scene.add(light);
 
-        // Chair Legs
-        function createChairLeg(x, z) {
-            const legGeometry = new THREE.BoxGeometry(0.2, 2, 0.2);
-            const leg = new THREE.Mesh(legGeometry, tableMaterial);
-            leg.position.set(x, -5.5, z);
-            scene.add(leg);
-        }
-        createChairLeg(-4.6, -0.6);
-        createChairLeg(-3.4, -0.6);
-        createChairLeg(-4.6, 0.6);
-        createChairLeg(-3.4, 0.6);
-
-        // Chair Backrest
-        const backrestGeometry = new THREE.BoxGeometry(1.5, 2, 0.2);
-        const backrest = new THREE.Mesh(backrestGeometry, tableMaterial);
-        backrest.position.set(-4, -3.5, -0.6);
-        scene.add(backrest);
-
-        // Lamp (Now Positioned on the Table)
-        const lampBaseGeometry = new THREE.CylinderGeometry(0.4, 0.6, 0.2, 32);
-        const lampBaseMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 });
-        const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
-        lampBase.position.set(0.5, -3.8, 0.5); // On top of the table
-        scene.add(lampBase);
-
-        const lampStandGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 32);
-        const lampStand = new THREE.Mesh(lampStandGeometry, lampBaseMaterial);
-        lampStand.position.set(0.5, -3.1, 0.5);
-        scene.add(lampStand);
-
-        const lampShadeGeometry = new THREE.ConeGeometry(0.8, 1.2, 32);
-        const lampShadeMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        const lampShade = new THREE.Mesh(lampShadeGeometry, lampShadeMaterial);
-        lampShade.position.set(0.5, -2.3, 0.5);
-        scene.add(lampShade);
-
-        // Add a Light Source Above the Lamp
-        const lampLight = new THREE.PointLight(0xffffaa, 1, 10);
-        lampLight.position.set(0.5, -2, 0.5);
-        scene.add(lampLight);
+        const ambientLight = new THREE.AmbientLight(0x404040); // Soft light for visibility
+        scene.add(ambientLight);
 
         function addEdges(mesh) {
             const edges = new THREE.EdgesGeometry(mesh.geometry);
@@ -143,7 +102,7 @@
         // Movement & Rotation Variables
         const speed = 0.2;
         let keys = {};
-        let yaw = 0, pitch = 0;
+        let rotation = new THREE.Vector2(0, 0);
         const sensitivity = 0.002;
 
         // Capture Key Presses
@@ -156,27 +115,36 @@
             document.getElementById("instructions").style.display = "none";
         });
 
-        // Mouse Look
         document.addEventListener("mousemove", (event) => {
             if (document.pointerLockElement === document.body) {
-                yaw -= event.movementX * sensitivity;
-                pitch -= event.movementY * sensitivity;
-                pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
-                camera.rotation.set(pitch, yaw, 0);
+                rotation.x -= event.movementX * sensitivity;
+                rotation.y -= event.movementY * sensitivity;
+                rotation.y = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotation.y)); // Clamp pitch
             }
         });
+
+        let clock = new THREE.Clock(); // Helps with frame-independent movement
 
         // Movement Function
         function animate() {
             requestAnimationFrame(animate);
+            let deltaTime = clock.getDelta(); // Time since last frame
 
+            // Apply Rotation with Quaternion (Better than Euler angles)
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromEuler(new THREE.Euler(rotation.y, rotation.x, 0, 'YXZ'));
+            camera.quaternion.copy(quaternion);
+
+            // Calculate Forward & Right Vectors
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
 
-            if (keys["KeyW"]) camera.position.add(forward.multiplyScalar(speed)); 
-            if (keys["KeyS"]) camera.position.add(forward.multiplyScalar(-speed)); 
-            if (keys["KeyA"]) camera.position.add(right.multiplyScalar(-speed)); 
-            if (keys["KeyD"]) camera.position.add(right.multiplyScalar(speed)); 
+            // Smooth Movement
+            const moveSpeed = 5 * deltaTime; // Speed scales with frame rate
+            if (keys["KeyW"]) camera.position.add(forward.multiplyScalar(moveSpeed));
+            if (keys["KeyS"]) camera.position.add(forward.multiplyScalar(-moveSpeed));
+            if (keys["KeyA"]) camera.position.add(right.multiplyScalar(-moveSpeed));
+            if (keys["KeyD"]) camera.position.add(right.multiplyScalar(moveSpeed));
 
             renderer.render(scene, camera);
         }
