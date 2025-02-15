@@ -19,3 +19,40 @@ canvas {
     cursor: pointer;
 }
 
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;       /* Size of the circle */
+    height: 5px;
+    background-color: red; /* Color of the circle */
+    border-radius: 50%;    /* Makes it a circle */
+    transform: translate(-50%, -50%); /* Centers it perfectly */
+    pointer-events: none;  /* Ensures it doesn’t block mouse events */
+    display: none;
+}
+
+#info {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#info img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
