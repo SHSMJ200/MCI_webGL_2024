@@ -193,13 +193,23 @@
         }
     }
 
-    // Hide info box when the close button is clicked
-    window.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            document.getElementById("info").style.display = "none";
-            document.getElementById("crosshair").style.display = "block";
-        }
-    });
+        // Hide info box when the close button is clicked
+        window.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                document.getElementById("info").style.display = "none";
+                document.getElementById("crosshair").style.display = "block";
+            }
+            
+            if (event.ctrlKey) {
+                if (document.pointerLockElement === document.body) {
+                    document.exitPointerLock();
+                }
+                else {
+                    document.body.requestPointerLock();
+                }
+            }
+
+        });
 
         // Movement & Rotation Variables
         const speed = 0.2;
