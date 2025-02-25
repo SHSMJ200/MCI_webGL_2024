@@ -44,15 +44,21 @@
         document.body.appendChild(renderer.domElement);
         
         // Start Camera Inside the Room
-        camera.position.set(0, -10, 8);
+        camera.position.set(0, -8, 8);
 
         // Room Dimensions
         const roomWidth = 100, roomHeight = 30, roomDepth = 100;
+        const textureLoader = new THREE.TextureLoader();
+        const wallTexture = textureLoader.load('models/back.png'); // Load your image  
+        const wallMaterial3 = new THREE.MeshBasicMaterial({ 
+            map: wallTexture, 
+            side: THREE.DoubleSide // Ensures the texture is visible from both sides
+        });
         const wallMaterial2 = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
         const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x003355, side: THREE.DoubleSide });
 
         // Back Wall
-        const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomHeight), wallMaterial);
+        const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomHeight), wallMaterial3);
         backWall.position.set(0, 0, -roomDepth / 2);
         scene.add(backWall);
         
@@ -124,7 +130,7 @@
                         let newFurniture = object.clone(); // Clone the object
                         newFurniture.position.set(
                             (j - 1) * spacing, // X-position
-                            -14,                // Y-position
+                            -13,                // Y-position
                             (i - 1) * spacing  // Z-position
                         );
                         
@@ -134,8 +140,8 @@
                         );
 
                         cube.position.set(
-                            (j - 1.3) * spacing,  // X-position (shifted for centering)
-                            -9,                 // Y-position (fixed height)
+                            (j - 1) * spacing,  // X-position (shifted for centering)
+                            -10,                 // Y-position (fixed height)
                             (i - 1) * spacing   // Z-position (shifted for centering)
                         );
                         
@@ -146,7 +152,7 @@
                         scene.add(cube);
                         furnitureInstances.push(cube);  // Add to the array for raycasting                       
 
-                        newFurniture.scale.set(1, 1, 1);  // Adjust scale if necessary
+                        newFurniture.scale.set(0.05, 0.05, 0.05);  // Adjust scale if necessary
                         newFurniture.traverse(function(child) {
                             if (child instanceof THREE.Mesh) {
                                 child.castShadow = true;
@@ -164,6 +170,42 @@
                 }
             });
         });       
+
+        const mtlLoaderPlant = new THREE.MTLLoader();
+        mtlLoaderPlant.load('models/plant.mtl', function (materials) {
+            materials.preload();
+            
+            const objLoaderPlant = new THREE.OBJLoader();
+            objLoaderPlant.setMaterials(materials);
+            objLoaderPlant.load('models/plant.obj', function (plant) {
+
+                // Define positions for the 4 plants
+                const positions = [
+                    { x: -30, y: -14, z: -30 },
+                    { x: 30, y: -14, z: -30 },
+                    { x: -30, y: -14, z: 30 },
+                    { x: 30, y: -14, z: 30 }
+                ];
+
+                positions.forEach(pos => {
+                    let newPlant = plant.clone();  // Clone the model
+                    newPlant.position.set(pos.x, pos.y, pos.z);
+                    newPlant.scale.set(2, 2, 2); // Adjust scale if needed
+                    
+                    // Enable shadow casting
+                    newPlant.traverse(function (child) {
+                        if (child instanceof THREE.Mesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+
+                    scene.add(newPlant);
+                });
+
+            });
+        });
+
 
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
