@@ -114,16 +114,16 @@
         scene.add(ambientLight);
         
         const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.load('models/furniture.mtl', function (materials) {
+        mtlLoader.load('models/Main table+PC.mtl', function (materials) {
             materials.preload();
             
             // Load OBJ Model
             const objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load('models/furniture.obj', function (object) {
+            objLoader.load('models/Main table+PC.obj', function (object) {
                 
-                const rows = 3, cols = 3; // 3x3 grid
-                const spacing = 20; // Space between objects
+                const rows = 5, cols = 4;
+                const spacing = 16; // Space between objects
                 
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
@@ -131,7 +131,7 @@
                         newFurniture.position.set(
                             (j - 1) * spacing, // X-position
                             -13,                // Y-position
-                            (i - 1) * spacing  // Z-position
+                            (i - 2) * spacing * 0.7  // Z-position
                         );
                         
                         const cube = new THREE.Mesh(
@@ -140,9 +140,9 @@
                         );
 
                         cube.position.set(
-                            (j - 1) * spacing,  // X-position (shifted for centering)
-                            -10,                 // Y-position (fixed height)
-                            (i - 1) * spacing   // Z-position (shifted for centering)
+                            (j - 1.3) * spacing,  // X-position (shifted for centering)
+                            -9,                 // Y-position (fixed height)
+                            (i - 2) * spacing * 0.7   // Z-position (shifted for centering)
                         );
                         
                         // Add shadow properties
@@ -152,7 +152,7 @@
                         scene.add(cube);
                         furnitureInstances.push(cube);  // Add to the array for raycasting                       
 
-                        newFurniture.scale.set(0.05, 0.05, 0.05);  // Adjust scale if necessary
+                        newFurniture.scale.set(0.8, 0.8, 0.8);  // Adjust scale if necessary
                         newFurniture.traverse(function(child) {
                             if (child instanceof THREE.Mesh) {
                                 child.castShadow = true;
