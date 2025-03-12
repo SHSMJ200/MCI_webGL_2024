@@ -213,27 +213,27 @@
         window.addEventListener('click', onMouseClick, false);
 
         function onMouseClick(event) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(furnitureInstances);
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(furnitureInstances);
 
-        if (intersects.length > 0) {
-            const selectedFurniture = intersects[0].object;
-            const index = furnitureInstances.indexOf(selectedFurniture);
+            if (intersects.length > 0) {
+                const selectedFurniture = intersects[0].object;
+                const index = furnitureInstances.indexOf(selectedFurniture);
 
-            if (index !== -1) {
-                const info = furnitureData[index];
+                if (index !== -1) {
+                    const info = furnitureData[index];
 
-                // Update and show the info box
-                document.getElementById("info").style.display = "flex";
-                document.getElementById("infoText").innerText = info.description;
-                document.getElementById("infoImage").src = `images/furniture${index + 1}.png`;
-                document.getElementById("crosshair").style.display = "none";
+                    // Update and show the info box
+                    document.getElementById("info").style.display = "flex";
+                    document.getElementById("infoText").innerText = info.description;
+                    document.getElementById("infoImage").src = `images/furniture${index + 1}.png`;
+                    document.getElementById("crosshair").style.display = "none";
+                }
             }
         }
-    }
 
         // Hide info box when the close button is clicked
         window.addEventListener("keydown", function (event) {
